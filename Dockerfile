@@ -30,4 +30,6 @@ RUN rm -rf /tmp/build
 
 WORKDIR /var/www/
 
+EXPOSE 80/tcp
+
 ENTRYPOINT ["/usr/sbin/nginx","-g","daemon off;"]
