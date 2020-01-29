@@ -1,67 +1,36 @@
 steps:
   # build the container image
-  # - name: "gcr.io/cloud-builders/docker"
-  #   args:
-  #     - build
-  #     - -t
-  #     - gcr.io/$PROJECT_ID/frontend:$COMMIT_SHA
-  #     - .
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - build
+      - -t
+      - gcr.io/$PROJECT_ID/frontend:$COMMIT_SHA
+      - .
 
-  #   # push container image
-  # - name: "gcr.io/cloud-builders/docker"
-  #   args:
-  #     - push
-  #     - gcr.io/$PROJECT_ID/frontend:$COMMIT_SHA
+    # push container image
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - push
+      - gcr.io/$PROJECT_ID/frontend:$COMMIT_SHA
 
   - name: "gcr.io/$PROJECT_ID/helm"
     args:
       - upgrade
       - --install
       - frontend
-      - evaluation-helm-charts/frontend
+      - charts/frontend
+      - --set
+      - image.repository=gcr.io/$PROJECT_ID/frontend
+      - --set
+      - image.version=$COMMIT_SHA
     env:
       - "CLOUDSDK_COMPUTE_REGION=$_REGION"
       - "CLOUDSDK_CONTAINER_CLUSTER=$_CLUSTER"
-      - "HELM_REPO_URL=https://24452573dff185ce95c8fb506b80b8620ff6a29e@github.com/luisgreen/evaluation-helm-charts.git"
+      - "HELM_REPO_NAME=charts"
+      - "HELM_REPO_URL=https://my-devprod-vps-helm-charts.storage.googleapis.com/"
       - "TILLERLESS=true"
-    tags: ["cloud-builders-community"]
 
-  # # Connect to the repository
-  # - name: "gcr.io/cloud-builders/git"
-  #   args:
-  #     - clone
-  #     - https://24452573dff185ce95c8fb506b80b8620ff6a29e@github.com/luisgreen/evaluation-helm-charts.git
-  #   volumes:
-  #     - name: "charts"
-  #       path: /root/
-  # # Configure a kubectl workspace for this project
-  # - name: gcr.io/cloud-builders/kubectl
-  #   args:
-  #     - cluster-info
-  #   env:
-  #     - CLOUDSDK_COMPUTE_REGION=$_CUSTOM_REGION
-  #     - CLOUDSDK_CONTAINER_CLUSTER=$_CUSTOM_CLUSTER
-  #     - KUBECONFIG=/workspace/.kube/config
-  # # deploy container image to GKE
-  # - name: "gcr.io/cloud-builders/kubectl"
-  #   id: Deploy
-  #   args:
-  #     - "patch"
-  #     - "deployment"
-  #     - "frontend"
-  #     - "-p"
-  #     - '"{"spec":{"template":{"metadata":{"annotations":{"date":"$BUILD_ID"}}}}}"'
-  #   env:
-  #     - "CLOUDSDK_COMPUTE_REGION=$_REGION"
-  #     - "CLOUDSDK_CONTAINER_CLUSTER=$_CLUSTER"
-  # - name: "gcr.io/cloud-builders/gke-deploy:stable"
-  #   args:
-  #     - run
-  #     - --filename=[KUBERNETES_CONFIG_FILE]
-  #     - --location=[LOCATION]
-  #     - --cluster=[CLUSTER]
 substitutions:
+  _KEYRING: dev-evlsrv-algodon-keyring
   _REGION: europe-north1
   _CLUSTER: lab-evlsrv-notejam-cluster
-# git clone https://24452573dff185ce95c8fb506b80b8620ff6a29e@github.com/luisgreen/evaluation-helm-charts.git
-
