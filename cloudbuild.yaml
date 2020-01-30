@@ -23,14 +23,15 @@ steps:
       - image.repository=gcr.io/$PROJECT_ID/frontend
       - --set
       - image.version=$COMMIT_SHA
+      - --set
+      - environment=$_ENV
     env:
       - "CLOUDSDK_COMPUTE_REGION=$_REGION"
       - "CLOUDSDK_CONTAINER_CLUSTER=$_CLUSTER"
       - "HELM_REPO_NAME=charts"
       - "HELM_REPO_URL=https://my-devprod-vps-helm-charts.storage.googleapis.com/"
       - "TILLERLESS=true"
-
-substitutions:
-  _KEYRING: dev-evlsrv-algodon-keyring
-  _REGION: europe-north1
-  _CLUSTER: lab-evlsrv-notejam-cluster
+# Declared on Cloud Trigger
+# substitutions:
+#   _REGION: europe-north1
+#   _CLUSTER: lab-evlsrv-notejam-cluster
